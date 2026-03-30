@@ -87,6 +87,22 @@ class AdminStatistics(BaseModel):
     recent_submissions: List[RecentSubmission]
     user_statistics: List[UserStat]
 
+# ===== QUESTION MANAGEMENT MODELS =====
+class CreateQuestionRequest(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: str
+
+class UpdateQuestionRequest(BaseModel):
+    question: Optional[str] = None
+    options: Optional[List[str]] = None
+    correct_answer: Optional[str] = None
+
+class QuestionResponse(BaseModel):
+    success: bool
+    message: str
+    question: Optional[dict] = None
+
 # ===== DATABASE (In-Memory) =====
 USERS_DATABASE = {
     "admin": {
@@ -364,6 +380,105 @@ async def delete_user(username: str):
     
     del USERS_DATABASE[username]
     return {"success": True, "message": f"Đã xóa user {username}"}
+
+# ===== QUESTION MANAGEMENT ENDPOINTS =====
+@app.post("/admin/questions", response_model=QuestionResponse)
+async def create_question(request: CreateQuestionRequest):
+    """Tạo câu hỏi mới (admin only)"""
+    # Validate options has 4 items
+    if len(request.options) != 4:
+        return QuestionResponse(
+            success=False,
+            message="Câu hỏi phải có đúng 4 lựa chọn"
+        )
+    
+    # Validate correct answer is in options
+    if request.correct_answer not in request.options:
+        return QuestionResponse(
+            success=False,
+            message="Đáp án chính xác phải nằm trong các lựa chọn"
+        )
+    
+    # Find next ID
+    next_id = max([q["id"] for q in QUESTIONS]) + 1 if QUESTIONS else 1
+    
+    new_question = {
+        "id": next_id,
+        "question": request.question,
+        "options": request.options,
+        "correct_answer": request.correct_answer
+    }
+    
+    QUESTIONS.append(new_question)
+    
+    return QuestionResponse(
+        success=True,
+        message=f"Đã thêm câu hỏi mới với ID {next_id}",
+        question=new_question
+    )
+
+@app.put("/admin/questions/{question_id}", response_model=QuestionResponse)
+async def update_question(question_id: int, request: UpdateQuestionRequest):
+    """Cập nhật câu hỏi (admin only)"""
+    # Find question
+    question = None
+    for q in QUESTIONS:
+        if q["id"] == question_id:
+            question = q
+            break
+    
+    if not question:
+        return QuestionResponse(
+            success=False,
+            message=f"Câu hỏi với ID {question_id} không tồn tại"
+        )
+    
+    # Update fields if provided
+    if request.question is not None:
+        question["question"] = request.question
+    
+    if request.options is not None:
+        if len(request.options) != 4:
+            return QuestionResponse(
+                success=False,
+                message="Câu hỏi phải có đúng 4 lựa chọn"
+            )
+        question["options"] = request.options
+    
+    if request.correct_answer is not None:
+        # Check if correct answer is in options
+        if request.correct_answer not in question["options"]:
+            return QuestionResponse(
+                success=False,
+                message="Đáp án chính xác phải nằm trong các lựa chọn"
+            )
+        question["correct_answer"] = request.correct_answer
+    
+    return QuestionResponse(
+        success=True,
+        message=f"Đã cập nhật câu hỏi ID {question_id}",
+        question=question
+    )
+
+@app.delete("/admin/questions/{question_id}", response_model=QuestionResponse)
+async def delete_question(question_id: int):
+    """Xóa câu hỏi (admin only)"""
+    global QUESTIONS
+    
+    # Find and remove question
+    original_length = len(QUESTIONS)
+    QUESTIONS = [q for q in QUESTIONS if q["id"] != question_id]
+    
+    if len(QUESTIONS) == original_length:
+        return QuestionResponse(
+            success=False,
+            message=f"Câu hỏi với ID {question_id} không tồn tại"
+        )
+    
+    return QuestionResponse(
+        success=True,
+        message=f"Đã xóa câu hỏi ID {question_id}"
+    )
 
 # ===== HEALTH CHECK =====
 @app.get("/")
