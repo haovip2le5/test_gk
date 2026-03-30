@@ -2,6 +2,13 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  background: white;
+  border-radius: 8px;
+}
+
+body.dark-mode .quiz-container {
+  background: #2a2a2a;
+  color: #fff;
 }
 
 .progress-bar {
@@ -19,20 +26,28 @@
   transition: width 0.3s ease;
 }
 
+/* ===== NEWLY ADDED - Dark mode for progress bar ===== */
+body.dark-mode .progress-bar {
+  background-color: #333;
+}
+
+body.dark-mode .progress-fill {
+  background-color: #66bb6a;
+}
+/* ===== NEWLY ADDED - Dark mode for progress bar ENDS ===== */
+
 .progress-text {
   text-align: center;
-  color: white;
+  color: #333;
   margin-bottom: 20px;
   font-weight: 500;
-  /* ===== NEWLY ADDED - Text shadow for light mode visibility ===== */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  /* ===== NEWLY ADDED - Text shadow END ===== */
 }
 
 /* ===== NEWLY ADDED - Dark mode for progress text ===== */
 body.dark-mode .progress-text {
   color: #ccc;
 }
+/* ===== NEWLY ADDED - Dark mode for progress text ENDS ===== */
 
 .questions-list {
   display: flex;

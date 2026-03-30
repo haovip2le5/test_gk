@@ -5,122 +5,139 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f0f0f0;
   min-height: 100vh;
   padding: 20px;
 }
 
-/* ===== NEWLY ADDED - Dark mode for body ===== */
 body.dark-mode {
-  background: #0f0f0f;
+  background: #1a1a1a;
+  color: #fff;
 }
 
 .app {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
 h1 {
   text-align: center;
-  color: white;
-  font-size: 2.5rem;
+  color: #333;
+  font-size: 1.8rem;
   margin-bottom: 30px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ===== NEWLY ADDED - Dark mode for h1 ===== */
 body.dark-mode h1 {
   color: #fff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .start-screen {
   background: white;
-  border-radius: 15px;
-  padding: 40px;
+  padding: 30px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+body.dark-mode .start-screen {
+  background: #2a2a2a;
+  color: #fff;
 }
 
 .start-screen p {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 15px;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+body.dark-mode .start-screen p {
+  color: #ccc;
 }
 
 .start-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #333;
   color: white;
   border: none;
-  padding: 15px 40px;
-  font-size: 1.3rem;
-  border-radius: 30px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  border-radius: 4px;
   cursor: pointer;
   margin-top: 20px;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .start-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+  background: #555;
 }
 
-/* ===== NEWLY ADDED - DARK MODE CSS ===== */
+body.dark-mode .start-btn {
+  background: #555;
+}
+
+body.dark-mode .start-btn:hover {
+  background: #777;
+}
+
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  gap: 20px;
+  gap: 15px;
 }
 
 .app-header h1 {
   margin: 0;
   flex: 1;
-  text-align: center;
+  font-size: 1.5rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-badge {
+  background: #e0e0e0;
+  color: #333;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+body.dark-mode .user-badge {
+  background: #444;
+  color: #fff;
+}
+
+.logout-btn,
+.theme-button {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.logout-btn:hover,
+.theme-button:hover {
+  background: #555;
+}
+
+body.dark-mode .logout-btn,
+body.dark-mode .theme-button {
+  background: #555;
+}
+
+body.dark-mode .logout-btn:hover,
+body.dark-mode .theme-button:hover {
+  background: #777;
 }
 
 .theme-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 20px;
-  transition: transform 0.3s;
+  padding: 6px 8px;
+  font-size: 1rem;
 }
-
-.theme-button:hover {
-  transform: scale(1.2);
-}
-
-.start-screen.dark {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-.start-screen.dark p {
-  color: #ccc;
-}
-
-.start-screen.dark h2 {
-  color: #fff;
-}
-
-/* ===== NEWLY ADDED - Dark mode for header elements ===== */
-body.dark-mode .user-badge {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-body.dark-mode .logout-button {
-  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
-}
-
-body.dark-mode .logout-button:hover {
-  box-shadow: 0 5px 15px rgba(192, 57, 43, 0.5);
-}
-/* ===== NEWLY ADDED - Dark mode for header elements END ===== */
-
-/* ===== NEWLY ADDED - DARK MODE CSS ENDS ===== */

@@ -1,0 +1,220 @@
+/* ===== NEWLY ADDED - ADMIN DASHBOARD STYLING ===== */
+.admin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-container.dark {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.admin-header {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-container.dark .admin-header {
+  background: #2a2a3e;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.admin-container.dark .admin-header h1 {
+  color: #fff;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+}
+
+.loading {
+  text-align: center;
+  color: white;
+  font-size: 16px;
+  padding: 40px 20px;
+}
+
+.dashboard {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-container.dark .dashboard {
+  background: #2a2a3e;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-box {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-container.dark .stat-box {
+  background: #3a3a4e;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 10px;
+}
+
+.stat-name {
+  font-size: 14px;
+  color: #666;
+}
+
+.admin-container.dark .stat-name {
+  color: #aaa;
+}
+
+.recent {
+  margin-bottom: 40px;
+}
+
+.recent h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.admin-container.dark .recent h3 {
+  color: #fff;
+}
+
+.submission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.submission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 5px;
+  border-left: 4px solid #667eea;
+}
+
+.admin-container.dark .submission-item {
+  background: #3a3a4e;
+  border-left-color: #667eea;
+}
+
+.submission-item .username {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.admin-container.dark .submission-item .username {
+  color: #fff;
+}
+
+.submission-item .score {
+  color: #28a745;
+  font-weight: 500;
+  margin: 0 20px;
+}
+
+.submission-item .time {
+  font-size: 12px;
+  color: #999;
+}
+
+.admin-container.dark .submission-item .time {
+  color: #aaa;
+}
+
+.user-stats {
+  margin-top: 40px;
+}
+
+.user-stats h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.admin-container.dark .user-stats h3 {
+  color: #fff;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.users-table th {
+  background: #f0f0f0;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.admin-container.dark .users-table th {
+  background: #3a3a4e;
+  color: #fff;
+  border-bottom-color: #4a4a5e;
+}
+
+.users-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+}
+
+.admin-container.dark .users-table td {
+  border-bottom-color: #4a4a5e;
+  color: #ccc;
+}
+
+.users-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.admin-container.dark .users-table tbody tr:hover {
+  background: #3a3a4e;
+}
+
+/* ===== NEWLY ADDED - ADMIN DASHBOARD STYLING ENDS ===== */

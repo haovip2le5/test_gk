@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
+import hashlib
 
 app = FastAPI()
 
@@ -14,7 +16,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data Models
+# ===== AUTHENTICATION MODELS =====
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginResponse(BaseModel):
+    success: bool
+    message: str
+    user: Optional[dict] = None
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    confirmPassword: str
+    role: str = "user"
+
+class RegisterResponse(BaseModel):
+    success: bool
+    message: str
+
+class User(BaseModel):
+    username: str
+    role: str
+
+# ===== QUIZ MODELS =====
 class Question(BaseModel):
     id: int
     question: str
@@ -26,6 +52,7 @@ class Answer(BaseModel):
     selected_answer: str
 
 class SubmissionData(BaseModel):
+    username: Optional[str] = None
     answers: List[Answer]
 
 class QuestionResult(BaseModel):
@@ -40,6 +67,43 @@ class SubmissionResult(BaseModel):
     total_questions: int
     score: float
     results: List[QuestionResult]
+
+# ===== ADMIN MODELS =====
+class RecentSubmission(BaseModel):
+    username: str
+    score: float
+    timestamp: str
+
+class UserStat(BaseModel):
+    username: str
+    submission_count: int
+    average_score: float
+
+class AdminStatistics(BaseModel):
+    total_users: int
+    total_submissions: int
+    average_score: float
+    highest_score: float
+    recent_submissions: List[RecentSubmission]
+    user_statistics: List[UserStat]
+
+# ===== DATABASE (In-Memory) =====
+USERS_DATABASE = {
+    "admin": {
+        "password": hashlib.sha256("pass123".encode()).hexdigest(),
+        "role": "admin"
+    },
+    "user1": {
+        "password": hashlib.sha256("pass123".encode()).hexdigest(),
+        "role": "user"
+    },
+    "user2": {
+        "password": hashlib.sha256("pass123".encode()).hexdigest(),
+        "role": "user"
+    }
+}
+
+SUBMISSIONS_HISTORY = []
 
 # Sample Questions Database
 QUESTIONS = [
@@ -108,6 +172,67 @@ QUESTIONS = [
     },
 ]
 
+# ===== AUTHENTICATION ENDPOINTS =====
+@app.post("/login", response_model=LoginResponse)
+async def login(request: LoginRequest):
+    """User login endpoint"""
+    user_data = USERS_DATABASE.get(request.username)
+    
+    if not user_data:
+        return LoginResponse(
+            success=False,
+            message="Username không tồn tại"
+        )
+    
+    hashed_password = hashlib.sha256(request.password.encode()).hexdigest()
+    if user_data["password"] != hashed_password:
+        return LoginResponse(
+            success=False,
+            message="Mật khẩu không chính xác"
+        )
+    
+    return LoginResponse(
+        success=True,
+        message="Đăng nhập thành công",
+        user={
+            "username": request.username,
+            "role": user_data["role"]
+        }
+    )
+
+@app.post("/register", response_model=RegisterResponse)
+async def register(request: RegisterRequest):
+    """User registration endpoint"""
+    if request.username in USERS_DATABASE:
+        return RegisterResponse(
+            success=False,
+            message="Tên người dùng đã tồn tại"
+        )
+    
+    if request.password != request.confirmPassword:
+        return RegisterResponse(
+            success=False,
+            message="Mật khẩu không khớp"
+        )
+    
+    if len(request.password) < 6:
+        return RegisterResponse(
+            success=False,
+            message="Mật khẩu phải có ít nhất 6 ký tự"
+        )
+    
+    hashed_password = hashlib.sha256(request.password.encode()).hexdigest()
+    USERS_DATABASE[request.username] = {
+        "password": hashed_password,
+        "role": request.role
+    }
+    
+    return RegisterResponse(
+        success=True,
+        message="Đăng ký thành công"
+    )
+
+# ===== QUIZ ENDPOINTS =====
 @app.get("/questions", response_model=List[Question])
 async def get_questions():
     """Lấy danh sách tất cả câu hỏi"""
@@ -144,6 +269,14 @@ async def submit_answers(submission: SubmissionData):
     total_questions = len(QUESTIONS)
     score = round((correct_count / total_questions) * 10, 1) if total_questions > 0 else 0
     
+    # Track submission in history
+    if submission.username:
+        SUBMISSIONS_HISTORY.append({
+            "username": submission.username,
+            "score": score,
+            "timestamp": datetime.now().isoformat()
+        })
+    
     return SubmissionResult(
         correct_count=correct_count,
         total_questions=total_questions,
@@ -151,6 +284,88 @@ async def submit_answers(submission: SubmissionData):
         results=question_results
     )
 
+# ===== ADMIN ENDPOINTS =====
+@app.get("/admin/users")
+async def get_all_users():
+    """Get all users with submission count"""
+    user_list = []
+    for username, user_data in USERS_DATABASE.items():
+        submission_count = sum(1 for s in SUBMISSIONS_HISTORY if s["username"] == username)
+        user_list.append({
+            "username": username,
+            "role": user_data["role"],
+            "submission_count": submission_count
+        })
+    return user_list
+
+@app.get("/admin/statistics", response_model=AdminStatistics)
+async def get_admin_statistics():
+    """Get overall quiz statistics"""
+    total_users = len(USERS_DATABASE)
+    total_submissions = len(SUBMISSIONS_HISTORY)
+    
+    if total_submissions == 0:
+        return AdminStatistics(
+            total_users=total_users,
+            total_submissions=0,
+            average_score=0.0,
+            highest_score=0.0,
+            recent_submissions=[],
+            user_statistics=[]
+        )
+    
+    scores = [s["score"] for s in SUBMISSIONS_HISTORY]
+    average_score = round(sum(scores) / len(scores), 1)
+    highest_score = round(max(scores), 1)
+    
+    # Get recent submissions (last 5)
+    recent = []
+    for submission in SUBMISSIONS_HISTORY[-5:]:
+        recent.append(RecentSubmission(
+            username=submission["username"],
+            score=submission["score"],
+            timestamp=submission["timestamp"]
+        ))
+    recent.reverse()  # Most recent first
+    
+    # Calculate user statistics
+    user_stats = {}
+    for submission in SUBMISSIONS_HISTORY:
+        username = submission["username"]
+        if username not in user_stats:
+            user_stats[username] = []
+        user_stats[username].append(submission["score"])
+    
+    user_statistics = []
+    for username, scores in user_stats.items():
+        user_statistics.append(UserStat(
+            username=username,
+            submission_count=len(scores),
+            average_score=round(sum(scores) / len(scores), 1)
+        ))
+    
+    return AdminStatistics(
+        total_users=total_users,
+        total_submissions=total_submissions,
+        average_score=average_score,
+        highest_score=highest_score,
+        recent_submissions=recent,
+        user_statistics=user_statistics
+    )
+
+@app.delete("/admin/users/{username}")
+async def delete_user(username: str):
+    """Delete a user (admin only)"""
+    if username not in USERS_DATABASE:
+        return {"success": False, "message": "User không tồn tại"}
+    
+    if USERS_DATABASE[username]["role"] == "admin":
+        return {"success": False, "message": "Không thể xóa admin"}
+    
+    del USERS_DATABASE[username]
+    return {"success": True, "message": f"Đã xóa user {username}"}
+
+# ===== HEALTH CHECK =====
 @app.get("/")
 async def root():
     """Health check endpoint"""

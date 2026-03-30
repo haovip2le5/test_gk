@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Quiz from './components/Quiz'
 import Results from './components/Results'
+import Login from './components/Login'
+import AdminDashboard from './components/AdminDashboard'
 import './App.css'
 
 function App() {
@@ -12,6 +14,8 @@ function App() {
   const [loading, setLoading] = useState(false)
   // ===== NEWLY ADDED - DARK MODE =====
   const [darkMode, setDarkMode] = useState(false)
+  // ===== NEWLY ADDED - USER STATE =====
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
     fetchQuestions()
@@ -20,6 +24,12 @@ function App() {
     const storedDarkMode = localStorage.getItem('darkMode')
     if (storedDarkMode === 'true') {
       setDarkMode(true)
+    }
+
+    // ===== NEWLY ADDED - RESTORE USER SESSION =====
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
     }
   }, [])
 
@@ -47,7 +57,23 @@ function App() {
     localStorage.setItem('darkMode', (!darkMode).toString())
   }
 
-  // ===== NEWLY ADDED - DARK MODE FUNCTION ENDS =====
+  // ===== NEWLY ADDED - LOGIN HANDLER =====
+  const handleLoginSuccess = (userData) => {
+    setUser(userData)
+    localStorage.setItem('user', JSON.stringify(userData))
+  }
+
+  // ===== NEWLY ADDED - LOGOUT HANDLER =====
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('user')
+    setStarted(false)
+    setSubmitted(false)
+    setAnswers({})
+    setResults(null)
+  }
+
+  // ===== NEWLY ADDED - DARK MODE & LOGIN FUNCTIONS END =====
   const handleStart = () => {
     setStarted(true)
     setSubmitted(false)
@@ -66,6 +92,7 @@ function App() {
     setLoading(true)
     try {
       const submissionData = {
+        username: user?.username || 'anonymous',
         answers: Object.entries(answers).map(([questionId, selectedAnswer]) => ({
           question_id: parseInt(questionId),
           selected_answer: selectedAnswer
@@ -97,50 +124,64 @@ function App() {
     setResults(null)
   }
 
+  // ===== NEWLY ADDED - THREE-WAY ROUTER =====
+  // If user is not logged in, show Login component
+  if (!user) {
+    return <Login onLoginSuccess={handleLoginSuccess} darkMode={darkMode} />
+  }
+
+  // If user is admin, show AdminDashboard component
+  if (user.role === 'admin') {
+    return <AdminDashboard darkMode={darkMode} onLogout={handleLogout} />
+  }
+
+  // Otherwise, show the quiz interface for regular users
   return (
-    // ===== NEWLY ADDED - DARK MODE CONTAINER =====
     <div className="app">
-      {/* ===== NEWLY ADDED - DARK MODE HEADER =====*/}
+      {/* ===== NEWLY ADDED - DARK MODE HEADER WITH USER BADGE =====*/}
       <div className="app-header">
         <h1>Quiz App</h1>
-        <button onClick={handleToggleDarkMode} className="theme-button" title="Toggle Dark Mode">
-          {darkMode ? '☀️' : '🌙'}
-        </button>
+        <div className="header-right">
+          <span className="user-badge">{user.username}</span>
+          <button onClick={handleLogout} className="logout-btn" title="Logout">
+            🚪 Logout
+          </button>
+          <button onClick={handleToggleDarkMode} className="theme-button" title="Toggle Dark Mode">
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
       </div>
 
       {!started && !submitted && (
-        // ===== NEWLY ADDED - DARK MODE CLASS =====
         <div className={`start-screen ${darkMode ? 'dark' : ''}`}>
-              <p>Chao mung ban den voi bai trac nghiem!</p>
-              <p>Bai quiz gom {questions.length} cau hoi.</p>
-              <button className="start-btn" onClick={handleStart}>
-                Bat dau lam bai
-              </button>
-            </div>
-          )}
-
-          {/* ===== NEWLY ADDED - darkMode PROP ===== */}
-          {started && !submitted && (
-            <Quiz
-              questions={questions}
-              answers={answers}
-              onSelectAnswer={handleSelectAnswer}
-              onSubmit={handleSubmit}
-              loading={loading}
-              darkMode={darkMode}
-            />
-          )}
-
-          {/* ===== NEWLY ADDED - darkMode PROP ===== */}
-          {submitted && results && (
-            <Results
-              results={results}
-              onRestart={handleRestart}
-              darkMode={darkMode}
-            />
-          )}
+          <p>Chao mung ban den voi bai trac nghiem!</p>
+          <p>Bai quiz gom {questions.length} cau hoi.</p>
+          <button className="start-btn" onClick={handleStart}>
+            Bat dau lam bai
+          </button>
         </div>
-      )
-    }
+      )}
+
+      {started && !submitted && (
+        <Quiz
+          questions={questions}
+          answers={answers}
+          onSelectAnswer={handleSelectAnswer}
+          onSubmit={handleSubmit}
+          loading={loading}
+          darkMode={darkMode}
+        />
+      )}
+
+      {submitted && results && (
+        <Results
+          results={results}
+          onRestart={handleRestart}
+          darkMode={darkMode}
+        />
+      )}
+    </div>
+  )
+}
 
 export default App
