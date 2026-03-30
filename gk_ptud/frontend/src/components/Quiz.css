@@ -1,0 +1,139 @@
+.quiz-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+  font-weight: 500;
+  /* ===== NEWLY ADDED - Text shadow for light mode visibility ===== */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  /* ===== NEWLY ADDED - Text shadow END ===== */
+}
+
+/* ===== NEWLY ADDED - Dark mode for progress text ===== */
+body.dark-mode .progress-text {
+  color: #ccc;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.question-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.question-card h3 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  padding: 12px 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+  border-color: #2196f3;
+  background-color: #e3f2fd;
+}
+
+.option-btn.selected {
+  border-color: #2196f3;
+  background-color: #2196f3;
+  color: white;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 30px auto;
+  padding: 15px 30px;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+}
+
+.submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* ===== NEWLY ADDED - Dark mode for submit button ===== */
+body.dark-mode .submit-btn:disabled {
+  background-color: #555;
+}
+
+/* ===== NEWLY ADDED - Dark mode Quiz Component ===== */
+.question-card.dark {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+.question-card.dark h3 {
+  color: #fff;
+}
+
+.option-btn.dark {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #fff;
+}
+
+.option-btn.dark:hover {
+  border-color: #667eea;
+}
+
+.option-btn.dark.selected {
+  background-color: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+/* ===== NEWLY ADDED - Dark mode Quiz Component ENDS ===== */
